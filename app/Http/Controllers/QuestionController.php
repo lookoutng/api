@@ -12,10 +12,7 @@ class QuestionController extends Controller
 {
    public function index(Request $request){
 
-    // $range = $request->input('range') ?? 3;
-
-    
-        // Question::get(where)
+    // Mata Add the sql Query here
    } 
 
    public function store(Request $request){
@@ -55,6 +52,7 @@ class QuestionController extends Controller
         $user->save();
 
         $response = [
+            'question' => $questions,
             'message' => 'Question asked Successfully'
         ];
         return response($response, 201);
@@ -105,23 +103,23 @@ class QuestionController extends Controller
             return response($response, 404);
         }
 
-        $question->update(
-            [
-                'type' => $type ?? $question->type,
-                'body' => $body ?? $question->body,
-            ]
-        );
+        $new_question =Question::create([
+            'body' => $body,
+            'user_id' => $user->id,
+            'type' => $type,
+            'edited_id' => $question->id
+        ]);
 
         $location = Location::find($id);
-        $location->update(
+        $new_location = Location::create(
             [
-            'lat' => $lat ?? $location->lat,
-            'long' => $long ?? $location->lat
+            'lat' => $lat,
+            'long' => $long
             ]
         );
 
         $response = [
-            'question' => $question,
+            'question' => $new_question,
             'message' => 'Question Update Successfully'
         ];
         return response($response, 201);

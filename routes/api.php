@@ -20,7 +20,6 @@ use App\Http\Controllers\QuestionController;
 |
 */
 
-Route::get('/questions', [QuestionController::class, 'index']);
 Route::post('/user/create', [UserController::class, 'store']);
 
 Route::group(
@@ -32,21 +31,23 @@ Route::group(
         Route::put('/question/update/{id}', [QuestionController::class, 'update']);
         Route::post('/question/create', [QuestionController::class, 'store']);
         Route::delete('/question/delete/{id}', [QuestionController::class, 'delete']);
+
+        Route::get('/questions', [QuestionController::class, 'index']);
         Route::get('/question/id/{id}', [QuestionController::class, 'show']);
 
         Route::post('/user/logout', [UserController::class, 'logout']);
         Route::get('/user', [UserController::class, 'show']);
         Route::put('/user/update', [UserController::class, 'update']);
 
-        Route::put('/answer/update', [AnswerController::class, 'update']);
-        Route::post('/answer/create', [AnswerController::class, 'store']);
-        Route::delete('/answer/delete', [AnswerController::class, 'delete']);
+        Route::put('/answer/update/{id}', [AnswerController::class, 'update']);
+        Route::post('/answer/create/{question_id}', [AnswerController::class, 'store']);
+        Route::delete('/answer/delete/{id}', [AnswerController::class, 'delete']);
 
-        Route::put('/location/store', [AnswerController::class, 'update']);
+        Route::post('/location/store', [AnswerController::class, 'update']);
         
-        Route::post('/option/create', [AnswerController::class, 'store']);
-        Route::delete('/option/delete', [AnswerController::class, 'delete']);
-        Route::put('/option/update', [AnswerController::class, 'update']);
+        Route::post('/option/create', [OptionController::class, 'store']);
+        Route::delete('/option/delete/{question_id}', [OptionController::class, 'delete']);
+        Route::put('/option/update/{id}', [OptionController::class, 'update']);
 
 
     }
