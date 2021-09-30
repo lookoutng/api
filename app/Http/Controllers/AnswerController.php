@@ -7,45 +7,64 @@ use App\Models\Answer;
 
 class AnswerController extends Controller
 {
-    ####Create Answer
-    public function store($request,$id){
+    ####CREATE ANWWR FOR QUESTION
+    public function store(Request $request,$question_id){
         $user = $request->user();
         $request->validate([
-            // 'question_id' => 'required|Integer' ,
-            'body' => 'string|required',
-            'edited_id' => 'required|string',
-            'status' => 'required|Integer',
+            'body' => 'string',
+            'status' => 'Integer',
+            'is_edited' => 'Integer'
         ]);
+
+        if(Answer::where('question_id',$question_id)->where('user_id',$user->id))
+        {
+            $response = [
+                'message' => "You've already answer the question"
+            ];
+            return response($response, 402);
+        }
 
         $request->merge([
             'user_id' => $user->id,
-            'question_id' => $id
+            'question_id' => $question_id
         ]);
 
         Answer::create($request->all());
+
+        $response = [
+            'message' => 'Answer created succesfully'
+        ];
+        return response($response,201);
     }
 
-    ###Update Answer
-    public function update(Request $request){
-        $datas = $request->validate([
-            'id' => 'Integer',
-            'body' => 'string',
-            'edited_id' => 'string',
-            'status' => 'Integer',
-        ]);
-        extract($datas);
+    #UPDATE USER
+    public function update(Request $request,$id){
 
         $answer = Answer::find($id);
+        $user = $request->user();
+        $request->validate(
+            [
+                'body' => 'string',
+                'status' => 'Integer',
+            ]
+        );
+
         $answer->update([
-            'body' => $body ??  $answer->body,
-            'edited_id' => $edited_id ??  $answer->edited_id,
-            'status' => $status ??  $answer->status,
+            'body' => $request->input('body') ?? $answer->body,
+            'status' => $request->input('status') ?? $answer->status
         ]);
+
+        $response = [
+            'answer' => $answer,
+            'message' => 'Answer Updated Succesfully'
+        ];
+        return response($response,201);
     }
 
 
-    ###delete Answer
-    public function delete($id){
+    #DELETE AN ANSWER
+    public function delete($id)
+    {
         $answer = $answer::find($id);
         if(!$answer || $answer->user_id != auth()->user()->id)
         {
@@ -60,6 +79,20 @@ class AnswerController extends Controller
         $response = [
             'message' => "Answer deleted"
         ];
+        return response($response, 201);
+    }
+
+    #EDITED VERSION OF THE ANSWER
+    #NOO MORE USEFUL.....UPDATE MODEL IS APPLIED
+    public function previous(Request $request,$id){
+        $user = $request->user();
+        $answers = Answer::where('user_id',$user->id)->where('question_id', Answer::find($id)->question_id);
+        
+        $response = [
+            'answers' => $answer,
+            'message' => "previous answer version"
+        ];
+
         return response($response, 201);
     }
 }

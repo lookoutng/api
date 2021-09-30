@@ -18,10 +18,10 @@ class CreateAnswersTable extends Migration
             $table->Integer('question_id');
             $table->Integer('user_id');
 
-            $table->Integer('body');
-            $table->Integer('edited_id')->nullable();
+            $table->string('body');
+            $table->Integer('is_edited')->default(0);
 
-            $table->Integer('status');
+            $table->Integer('status')->nullable();
             $table->timestamps();
         });
     }

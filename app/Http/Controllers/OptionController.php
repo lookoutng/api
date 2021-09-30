@@ -12,11 +12,12 @@ class OptionController extends Controller
 {
 
     ####Create Option
-    public function store(Request $request){
+    public function store(Request $request,$question_id){
+        $id = $question_id;
+
         $user = $request->user();
         $datas = $request->validate([
             'body' => 'string|required',
-            'question_id' => 'required|string',
         ]);
 
         extract($datas);
@@ -41,26 +42,31 @@ class OptionController extends Controller
     }
 
     ###Update Option
-    public function update(Request $request,$question_id){
-        $id = $question_id;
+    public function update(Request $request,$id){
+        $user = $request->user();
         $datas = $request->validate([
             'body' => 'string',
         ]);
-        extract($datas);
 
-        $Option = Option::find($id);
+        extract($datas);
+        $option = Option::find($id);
         if(Question::find($option->question_id)->user_id != $user->id)
         {
             $response = [
-                'message' => 'Question Not found' 
+                'message' => 'Option Not found' 
             ];
             return response($response, 404);
 
         }
 
-        $Option->update([
-            'body' => $body ??  $Option->body,
+        $option->update([
+            'body' => $body ??  $option->body,
         ]);
+
+        $response = [
+            'message' => 'Options Updated' 
+        ];
+        return response($response, 201);
     }
 
 

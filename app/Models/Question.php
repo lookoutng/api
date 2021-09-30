@@ -15,3 +15,4 @@ class Question extends Model
         'edited_id',
     ];
 }
+ 

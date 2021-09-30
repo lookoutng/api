@@ -8,20 +8,35 @@ use App\Models\Location;
 
 class LocationController extends Controller
 {
-    public function store(Request $request){
+    public function store(Request $request,$type,$id){
+        if($type == 'question'){
+            $type = 1 ;#User is 0 Question is 1
+        }
+        else if($type == 'user'){
+            $type = 0;
+        }
         $datas = $request->validate([
-            'parent_id' => 'required|Integer',
-            'lat' => 'required|double',
-            'long' => 'required|double',
-            'type' => 'required|Integer' #User is 0 Question is 1
+            'lat' => 'required',
+            'long' => 'required',
         ]);
         extract($datas);
 
-        Location::create($request->all());
-    }
+        $location = Location::create([
+            'parent_id' => $id,
+            'lat' => $lat,
+            'long' => $long,
+            'type' => $type
+        ]);
 
+        $response = [
+            'location' => $location,
+            'messsage' => 'location Created Successsfully'
+
+        ];
+        return response($response, 201);
+
+    }
     public function show(){
         
     }
-    //
 }

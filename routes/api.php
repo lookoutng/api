@@ -33,20 +33,22 @@ Route::group(
         Route::delete('/question/delete/{id}', [QuestionController::class, 'delete']);
 
         Route::get('/questions', [QuestionController::class, 'index']);
+        Route::get('/questions/edits/{id}', [QuestionController::class, 'index']);
         Route::get('/question/id/{id}', [QuestionController::class, 'show']);
+        Route::get('/question/user/default', [QuestionController::class, 'myQuestion']);
 
         Route::post('/user/logout', [UserController::class, 'logout']);
         Route::get('/user', [UserController::class, 'show']);
         Route::put('/user/update', [UserController::class, 'update']);
 
         Route::put('/answer/update/{id}', [AnswerController::class, 'update']);
-        Route::post('/answer/create/{question_id}', [AnswerController::class, 'store']);
+        Route::post('/answer/create/question/{question_id}', [AnswerController::class, 'store']);
         Route::delete('/answer/delete/{id}', [AnswerController::class, 'delete']);
 
-        Route::post('/location/store', [AnswerController::class, 'update']);
+        Route::post('/location/create/{type}/{id}', [LocationController::class, 'store']);
         
-        Route::post('/option/create', [OptionController::class, 'store']);
-        Route::delete('/option/delete/{question_id}', [OptionController::class, 'delete']);
+        Route::post('/option/create/question/{question_id}', [OptionController::class, 'store']);
+        Route::delete('/option/delete/{id}', [OptionController::class, 'delete']);
         Route::put('/option/update/{id}', [OptionController::class, 'update']);
 
 

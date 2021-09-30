@@ -13,7 +13,7 @@ use App\Models\User;
     class UserController extends Controller
     {
         
-        #########
+        #########Create User...
         function store(Request $request)
         {
             $fields = $request->validate([
@@ -37,6 +37,7 @@ use App\Models\User;
             return response($response, 201);
         }
     
+        #LOG USER OUT
         function logout(Request $request){
 
             auth()->user()->tokens()->delete();
@@ -74,6 +75,8 @@ use App\Models\User;
             return response($response,201);
     
         }
+
+        #GET USER LAST LOCATION
         function lastlocation(){
 
             $location = Location::where('type',0)->where('parent_id',$user->id)->orderby('id','DESC')->first();
