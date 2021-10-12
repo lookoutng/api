@@ -16,12 +16,14 @@ class AnswerController extends Controller
             'is_edited' => 'Integer'
         ]);
 
-        if(Answer::where('question_id',$question_id)->where('user_id',$user->id))
+        $answer = Answer::where('question_id',$question_id)->where('user_id',$user->id)->first();
+        if($answer)
         {
             $response = [
-                'message' => "You've already answer the question"
+                'message' => "You've already answer the question".$user->id,
+                'answer' => $answer,
             ];
-            return response($response, 402);
+            return response($response, 422);
         }
 
         $request->merge([
@@ -30,6 +32,8 @@ class AnswerController extends Controller
         ]);
 
         Answer::create($request->all());
+        $user->points += 30;
+        $user->save();
 
         $response = [
             'message' => 'Answer created succesfully'

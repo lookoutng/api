@@ -8,13 +8,8 @@ use App\Models\Location;
 
 class LocationController extends Controller
 {
-    public function store(Request $request,$type,$id){
-        if($type == 'question'){
-            $type = 1 ;#User is 0 Question is 1
-        }
-        else if($type == 'user'){
-            $type = 0;
-        }
+    public function store(Request $request){
+        
         $datas = $request->validate([
             'lat' => 'required',
             'long' => 'required',
@@ -22,10 +17,9 @@ class LocationController extends Controller
         extract($datas);
 
         $location = Location::create([
-            'parent_id' => $id,
+            'parent_id' => $request->user()->id,
             'lat' => $lat,
             'long' => $long,
-            'type' => $type
         ]);
 
         $response = [

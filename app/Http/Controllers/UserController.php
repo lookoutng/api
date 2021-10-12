@@ -25,6 +25,13 @@ use App\Models\User;
             $user = User::FirstOrCreate([
                 'tel' => $tel
             ]);
+            if($user->status == 1){
+                return response(
+                    [
+                    'message' => 'user supended, contact admin'
+                    ],
+                    402);
+            }
            
             $token = $user->createToken('userToken')->plainTextToken;
     
@@ -54,7 +61,7 @@ use App\Models\User;
             $fields = $request->validate([
                 'email' => 'string|unique:users,email',
                 'username' => 'string|unique:users,username',
-                'dp' => 'string',
+                'image' => 'image|mimes:jpeg,png,jpg,gif,svg',
                 'status' => 'Integer',
             ]);
     
@@ -63,9 +70,18 @@ use App\Models\User;
                 [
                     'username' => @$username ?? $user->username,
                     'email' => @$email ?? $user->email,
-                    'dp' => @$dp ?? $user->dp,
                 ]
             );
+
+            if($request->hasfile('image'))
+            {
+
+                $imageName = $user->username.'.'.$request->image->extension();
+                $user->dp = $request->image->move(public_path('images'), $imageName) ;
+                $user->save();
+                
+
+            }
 
             $response = [
                 'user' => $user->refresh(),
