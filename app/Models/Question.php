@@ -12,6 +12,8 @@ class Question extends Model
         'user_id',
         'body',
         'type',
+        'lat',
+        'long',
         'edited_id',
     ];
 }

@@ -8,7 +8,8 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Storage;
 use App\Models\User;
-    
+use Carbon\Carbon;
+
     
     class UserController extends Controller
     {
@@ -25,7 +26,7 @@ use App\Models\User;
             $user = User::FirstOrCreate([
                 'tel' => $tel
             ]);
-            if($user->status == 1){
+            if($user->status == 0){
                 return response(
                     [
                     'message' => 'user supended, contact admin'
