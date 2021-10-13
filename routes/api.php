@@ -22,6 +22,7 @@ use App\Http\Controllers\ReportController;
 */
 
 Route::post('/user/create', [UserController::class, 'store']);
+Route::post('/login', [UserController::class, 'store']);
 
 Route::group(
     [
