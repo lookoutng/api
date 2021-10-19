@@ -126,7 +126,7 @@ class QuestionController extends Controller
 
    public function myQuestion(Request $request){
         $user = $request->user();
-        $questions = Question::where('user_id',$user->id)->where('edited_id',0)->where('created_at', '>=', Carbon::now()->subDay()->toDateTimeString())->orderby('id','DESC')->get();
+        $questions = Question::where('user_id',$user->id)->where('created_at', '>=', Carbon::now()->subDay()->toDateTimeString())->orderby('id','DESC')->get();
 
         foreach($questions as $question){
             $answer_count = Answer::where('question_id',$question->id)->count();
@@ -158,6 +158,7 @@ class QuestionController extends Controller
                 'message' => 'Question Not found' 
             ];
             return response($response, 404);
+            die();
         }
 
         // $new_question = Question::create(
