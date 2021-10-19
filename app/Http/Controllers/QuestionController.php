@@ -8,6 +8,7 @@ use App\Models\Answer;
 use App\Models\Location;
 use App\Models\User;
 use App\Models\Option;
+use Carbon\Carbon;
 
 use Illuminate\Support\Facades\DB;
 
@@ -18,18 +19,32 @@ class QuestionController extends Controller
         extract($request->validate([
             'lat' => 'numeric|required',
             'long' => 'numeric|required',
+            'range' => 'Integer'
         ]));
 
+        $user = $request->user();
         $range = $request->input('range') ?? 3;
 
         // "SELECT *, @lat1 := SUBSTRING_INDEX(lazy_location, ',', 1) AS `lat`, @lon1 := SUBSTRING_INDEX(SUBSTRING_INDEX(lazy_location, ',', 2), ',', -1) AS `lon`, degrees(acos( sin(radians(@lat1)) * sin(radians(${p1[0]})) +  cos(radians(@lat1)) * cos(radians(${p1[0]})) * cos(radians(@lon1-${p1[1]}))))*60*1.1515 `vendor_dist` FROM `riders` AS d1 LEFT JOIN ( SELECT `user`, $time-start_time `period` FROM `sessions` ORDER BY `period` ) AS d2 ON d1.user=d2.user WHERE d2.user AND vendor_dist <= 3.10686 GROUP BY `id` ORDER BY vendor_dist LIMIT 10"
 
         $questions = DB::select('SELECT *, degrees(acos( sin(radians(`lat`)) * sin(radians(?)) +  cos(radians(`lat`)) * cos(radians(?)) * cos(radians(`long`-?))))*60*1.1515 AS `dist` FROM `questions` WHERE user_id!=? HAVING dist <= ? ORDER BY dist', [$lat, $lat, $long, $request->user()->id ?? 1, $range]);
-        // foreach($question as $questions){
-        //     $question->options = Option::where('question_id',$question->id)->get();
-        // }
+        $answered = [];
+        
+        if($questions){
+            foreach($questions as $x => $question){
+                $question->options = Option::where('question_id',$question->id)->get();
+                $question->answer = Answer::where('question_id',$question->id)->where('user_id',$user->id)->first();
+
+                if($question->answer){
+                    $answered[] = $question;
+                    array_splice($questions,$x,1);
+                }
+            }
+        }
+
         return response([
             'questions' => $questions,
+            'answered' => $answered,
             'message' => 'Task successful'
         ], 201);
    }
@@ -50,6 +65,7 @@ class QuestionController extends Controller
             'type' => 'string|required',
             'lat' => 'numeric',
             'long' => 'numeric',
+            'options' => ''
         ]);
 
         extract($datas);
@@ -61,7 +77,16 @@ class QuestionController extends Controller
             'lat' => $lat,
             'long' => $long,
         ]);
+        $question->refresh();
 
+        if($type == "M"){
+            foreach($options as $option){
+                Option::create([
+                    'body' => $option["body"],
+                    'question_id'=> $question->id
+                ]);        
+            }
+        }
         $user->points -= 30; 
         $user->save();
 
@@ -101,7 +126,7 @@ class QuestionController extends Controller
 
    public function myQuestion(Request $request){
         $user = $request->user();
-        $questions = Question::where('user_id',$user->id)->where('edited_id',0)->orderby('id','DESC')->get();
+        $questions = Question::where('user_id',$user->id)->where('edited_id',0)->where('created_at', '>=', Carbon::now()->subDay()->toDateTimeString())->orderby('id','DESC')->get();
 
         foreach($questions as $question){
             $answer_count = Answer::where('question_id',$question->id)->count();
@@ -135,17 +160,25 @@ class QuestionController extends Controller
             return response($response, 404);
         }
 
-        $new_question = Question::create(
-            [
-                'body' => $body,
-                'user_id' => $user->id,
-                'type' => 1,
-                'edited_id' => $question->id
-            ]
-        );
+        // $new_question = Question::create(
+        //     [
+        //         'body' => $body,
+        //         'user_id' => $user->id,
+        //         'type' => 1,
+        //         'lat' => $question->lat,
+        //         'long' => $question->long,
+        //         'edited_id' => $question->id
+        //     ]
+        // );
+        
+        $question->update(
+                [
+                    'body' => $body,
+                ]
+            );
 
         $response = [
-            'question' => $new_question,
+            'question' => $question,
             'message' => 'Question Update Successfully'
         ];
         return response($response, 201);

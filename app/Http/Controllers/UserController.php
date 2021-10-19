@@ -24,14 +24,16 @@ use Carbon\Carbon;
             extract($fields);
 
             $user = User::FirstOrCreate([
-                'tel' => $tel
+                'tel' => $tel,
+                'status' => 1,
             ]);
-            if($user->status == 0){
+            if(!$user->status){
                 return response(
                     [
                     'message' => 'user supended, contact admin'
                     ],
                     402);
+                die();
             }
            
             $token = $user->createToken('userToken')->plainTextToken;
@@ -77,8 +79,8 @@ use Carbon\Carbon;
             if($request->hasfile('image'))
             {
 
-                $imageName = $user->username.'.'.$request->image->extension();
-                $user->dp = $request->image->move(public_path('images'), $imageName) ;
+                $request->image->move(public_path('images'),$request->file('image')->getClientOriginalName()) ;
+                $user->dp = $request->file('image')->getClientOriginalName();
                 $user->save();
                 
 
