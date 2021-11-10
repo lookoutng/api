@@ -25,9 +25,10 @@ use Carbon\Carbon;
 
             $user = User::FirstOrCreate([
                 'tel' => $tel,
+                'dp' => 'image.png',
                 'status' => 1,
             ]);
-            if(!$user->status){
+            if($user->status == 0){
                 return response(
                     [
                     'message' => 'user supended, contact admin'

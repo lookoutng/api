@@ -27,7 +27,7 @@ class QuestionController extends Controller
 
         // "SELECT *, @lat1 := SUBSTRING_INDEX(lazy_location, ',', 1) AS `lat`, @lon1 := SUBSTRING_INDEX(SUBSTRING_INDEX(lazy_location, ',', 2), ',', -1) AS `lon`, degrees(acos( sin(radians(@lat1)) * sin(radians(${p1[0]})) +  cos(radians(@lat1)) * cos(radians(${p1[0]})) * cos(radians(@lon1-${p1[1]}))))*60*1.1515 `vendor_dist` FROM `riders` AS d1 LEFT JOIN ( SELECT `user`, $time-start_time `period` FROM `sessions` ORDER BY `period` ) AS d2 ON d1.user=d2.user WHERE d2.user AND vendor_dist <= 3.10686 GROUP BY `id` ORDER BY vendor_dist LIMIT 10"
 
-        $questions = DB::select('SELECT *, degrees(acos( sin(radians(`lat`)) * sin(radians(?)) +  cos(radians(`lat`)) * cos(radians(?)) * cos(radians(`long`-?))))*60*1.1515 AS `dist` FROM `questions` WHERE user_id!=? HAVING dist <= ? ORDER BY dist', [$lat, $lat, $long, $request->user()->id ?? 1, $range]);
+        $questions = DB::select('SELECT *, degrees(acos( sin(radians(`lat`)) * sin(radians(?)) +  cos(radians(`lat`)) * cos(radians(?)) * cos(radians(`long`-?))))*60*1.1515 AS `dist` FROM `questions` WHERE user_id!=? AND created_at >=? HAVING dist <= ? ORDER BY dist', [$lat, $lat, $long, $request->user()->id,Carbon::now()->subDay()->toDateTimeString(), $range]);
         $answered = [];
         
         if($questions){
