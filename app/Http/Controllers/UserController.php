@@ -32,16 +32,8 @@ use Carbon\Carbon;
                 'status' => 1,
             ]);
 
-            if(!$user->status){
-                return response(
-                    [
-                    'message' => 'user supended, contact admin'
-                    ],
-                    402);
-                die();
-            }
-           
-            $token = $user->createToken('userToken')->plainTextToken;
+            if($user->status){
+               $token = $user->createToken('userToken')->plainTextToken;
     
             $response = [
                 'user' => $user,
@@ -50,6 +42,17 @@ use Carbon\Carbon;
             ];
     
             return response($response, 201);
+            }
+            else{
+                 return response(
+                    [
+                    'message' => 'user supended, contact admin'
+                    ],
+                    402);
+                die();
+            }
+           
+            
         }
     
         #LOG USER OUT
