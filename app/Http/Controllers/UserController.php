@@ -25,12 +25,10 @@ use Carbon\Carbon;
 
             $user = User::FirstOrCreate([
                 'tel' => $tel,
-                
-            ]);
-            $user->update([
                 'dp' => 'image.png',
                 'status' => 1,
             ]);
+            
 
             if($user->status){
                $token = $user->createToken('userToken')->plainTextToken;
@@ -51,7 +49,6 @@ use Carbon\Carbon;
                     402);
                 die();
             }
-           
             
         }
     
