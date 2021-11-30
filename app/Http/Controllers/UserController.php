@@ -25,10 +25,13 @@ use Carbon\Carbon;
 
             $user = User::FirstOrCreate([
                 'tel' => $tel,
+                
+            ]);
+            $user->update([
                 'dp' => 'image.png',
                 'status' => 1,
             ]);
-            
+            $user->refresh();
 
             if($user->status){
                $token = $user->createToken('userToken')->plainTextToken;
