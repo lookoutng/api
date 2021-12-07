@@ -47,9 +47,9 @@ use Carbon\Carbon;
             else{
                  return response(
                     [
-                    'message' => 'user supended, contact admin'
+                    'message' => 'User suspended, Contact Admin'
                     ],
-                    402);
+                    401);
                 die();
             }
             
@@ -61,7 +61,7 @@ use Carbon\Carbon;
             auth()->user()->tokens()->delete();
     
             $response = [
-                'messsage' => 'Logged out Succesfully'
+                'message' => 'Logged out Succesfully'
             ];
             return response($response,201);
         }
@@ -96,7 +96,7 @@ use Carbon\Carbon;
 
             $response = [
                 'user' => $user->refresh(),
-                'message' => 'update successfull'
+                'message' => 'Update Successful'
             ];
             
             return response($response,201);
